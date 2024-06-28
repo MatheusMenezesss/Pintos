@@ -127,6 +127,8 @@ const char *thread_name (void);
 void thread_exit (void) NO_RETURN;
 void thread_yield (void);
 void thread_sleep(int64_t ticks); // declaração da função thread_sleep
+//thread_sleep coloca a thread na lista do threads dormindo
+void thread_wakeup(void); //acorda a thread
 
 /* Performs some operation on thread t, given auxiliary data AUX. */
 typedef void thread_action_func (struct thread *t, void *aux);
