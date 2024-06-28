@@ -325,14 +325,33 @@ void thread_sleep(int64_t ticks){
   ASSERT (!intr_context());
 
   old_level = intr_disable();
-  cur->time_to_wakeup = ticks;
+  //cur->time_to_wakeup = ticks;
   if(cur != idle_thread){
+    cur->time_to_wakeup = ticks;
     list_push_back(&sleep_list, &cur->elem);
+    
   }
   cur->status = THREAD_BLOCKED;
   schedule();
   intr_set_level (old_level);
 
+}
+
+void thread_wakeup(void){
+  struct list_elem *e = list_begin(&sleeo_list);
+  if(list_empty(&sleep_list)){
+      return;
+  }
+  while (e != list_end(&sleep_list)){
+      struct thread *t = list_entry(e, struct thread, elem);
+      if(t->time_to_wakeup > timer_ticks())
+        break;
+      enum intr_level old_level = intr_disable();
+      e = list_remove(e);
+      thread_unblock(t);
+      int_set_level(old_level); 
+  }
+  
 }
 
 /* Invoke function 'func' on all threads, passing along 'aux'.
